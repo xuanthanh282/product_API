@@ -1,0 +1,56 @@
+name: Product CD Docker Hub
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test-build-push:
+    runs-on: ubuntu-24.04
+
+    services:
+      mongodb:
+        image: mongo:latest
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval \"db.adminCommand('ping').ok\""
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      MONGO_URI: mongodb://localhost:27017/productdb
+      PORT: 3000
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run CRUD tests
+        run: npm test
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build Docker image
+        run: |
+          docker build \
+          -t ${{ secrets.DOCKERHUB_USERNAME }}/product_api:latest .
+
+      - name: Push Docker image
+        run: |
+          docker push \
+          ${{ secrets.DOCKERHUB_USERNAME }}/product_api:latest
