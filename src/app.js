@@ -8,7 +8,7 @@ app.use(express.json());
 
 app.get("/", (req, res) => {
     res.json({
-        message: "Product API is running"
+        message: "Product API is running1"
     });
 });
 

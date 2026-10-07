@@ -22,7 +22,7 @@ jobs:
 
     env:
       MONGO_URI: mongodb://localhost:27017/productdb
-      PORT: 3000
+      PORT: 3001
 
     steps:
       - name: Checkout repository
