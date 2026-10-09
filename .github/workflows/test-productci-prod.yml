@@ -45,5 +45,5 @@ jobs:
       - name: Run CRUD tests
         run: npm test
 
-      - name: Build Docker image change
+      - name: Build Docker image ch
         run: docker build -t product-api .
